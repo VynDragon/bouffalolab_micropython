@@ -1,0 +1,62 @@
+name: Build
+on: [push]
+permissions: {}
+
+jobs:
+  build:
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    container:
+      image: docker.io/zmkfirmware/zmk-build-riscv64:3.5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: Cache west modules
+        uses: actions/cache@v4
+        env:
+          cache-name: cache-zephyr-modules
+        with:
+          path: |
+            modules/
+            tools/
+            zephyr/
+            bootloader/
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('zephyr/west.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
+        timeout-minutes: 2
+        continue-on-error: true
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "14.x"
+      - name: Install @actions/artifact
+        run: npm install @actions/artifact
+      - name: Applies changes
+        run: sh patches/modify.sh
+#      - name: check
+#        run: cat micropython/ports/zephyr/zephyr_storage.c
+      - name: Initialize workspace (west init)
+        run: west init -l zephyr
+      - name: Update modules (west update)
+        run: west update
+      - name: Export Zephyr CMake package (west zephyr-export)
+        run: west zephyr-export
+      - name: Build
+        run: west build -p -c -b ai_wb2_12f micropython/ports/zephyr -DDTC_OVERLAY_FILE=${PWD}/patches/mpy_bl60x.overlay
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: ai_wb2_12f
+          path: zephyr/build/zephyr/zephyr.bin
+      - name: Build
+        run: west build -p -c -b xt_bl_zb1 micropython/ports/zephyr -DDTC_OVERLAY_FILE=${PWD}/patches/mpy_bl70x.overlay
+      - name: Archive code coverage results
+        uses: actions/upload-artifact@v4
+        with:
+          name: xt_bl_zb1
+          path: zephyr/build/zephyr/zephyr.bin

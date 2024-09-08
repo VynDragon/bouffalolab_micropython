@@ -1,0 +1,7 @@
+[submodule "zephyr"]
+	path = zephyr
+	url = https://github.com/VynDragon/zephyr
+	branch = bflb_upstreaming_efuse
+[submodule "micropython"]
+	path = micropython
+	url = https://github.com/micropython/micropython.git

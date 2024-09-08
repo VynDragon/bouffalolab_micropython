@@ -51,13 +51,13 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: ai_wb2_12f
-          path: ./zephyr/build/zephyr/zephyr.bin
+          path: build/zephyr/zephyr.bin
       - name: check
-        run: ls zephyr && ls zephyr/build && ls zephyr/build/zephyr
+        run: ls zephyr && ls build
       - name: Build
         run: west build -p -c -b xt_bl_zb1 micropython/ports/zephyr -DDTC_OVERLAY_FILE=${PWD}/patches/mpy_bl70x.overlay
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
         with:
           name: xt_bl_zb1
-          path: ./zephyr/build/zephyr/zephyr.bin
+          path: build/zephyr/zephyr.bin

@@ -1,0 +1,55 @@
+/ {
+	fstab {
+		compatible = "zephyr,fstab";
+		lfs: lfs {
+			compatible = "zephyr,fstab,littlefs";
+			mount-point = "/flash";
+			partition = <&storage_partition>;
+			read-size=<16>;
+			prog-size=<256>;
+			cache-size=<1024>;
+			lookahead-size=<32>;
+			block-cycles=<4>;
+		};
+	};
+};
+
+&pinctrl {
+	uart1_default: uart1_default {
+		group1 {
+			pinmux = <GPIO14_UART1_TX>;
+		};
+	};
+	i2c0_default: i2c0_default {
+		group1 {
+			pinmux = <GPIO17_I2C_SDA>,
+				 <GPIO12_I2C_SCL>;
+			bias-pull-up;
+			input-schmitt-enable;
+		};
+	};
+};
+
+&uart1 {
+	status = "okay";
+	current-speed = <115200>;
+	zephyr,deferred-init;
+	pinctrl-0 = <&uart1_default>;
+	pinctrl-names = "default";
+
+};
+
+&spi0 {
+	status = "okay";
+	zephyr,deferred-init;
+	pinctrl-0 = <&spi0_default>;
+	pinctrl-names = "default";
+};
+
+&i2c0 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+	zephyr,deferred-init;
+	pinctrl-0 = <&i2c0_default>;
+	pinctrl-names = "default";
+};

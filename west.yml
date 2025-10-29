@@ -1,0 +1,16 @@
+manifest:
+  remotes:
+    - name: VynDragon
+      url-base: https://github.com/VynDragon
+
+  projects:
+    - name: zephyr
+      remote: VynDragon
+      revision: future_bflb
+      import:
+        name-allowlist:
+          - hal_bouffalolab
+          - littlefs
+    - name: micropython
+      remote: VynDragon
+      revision: future_bouffalolab
